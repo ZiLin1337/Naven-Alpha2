@@ -1,6 +1,5 @@
 package com.heypixel.heypixelmod.obsoverlay;
 
-import cn.paradisemc.ZKMIndy;
 import com.heypixel.heypixelmod.obsoverlay.commands.CommandManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
@@ -12,7 +11,6 @@ import com.heypixel.heypixelmod.obsoverlay.modules.ModuleManager;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.render.ClickGUIModule;
 import com.heypixel.heypixelmod.obsoverlay.ui.notification.NotificationManager;
 import com.heypixel.heypixelmod.obsoverlay.utils.*;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.Fonts;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.PostProcessRenderer;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.Shaders;
@@ -23,26 +21,24 @@ import com.heypixel.heypixelmod.obsoverlay.values.ValueManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraftforge.common.MinecraftForge;
 
-import javax.swing.text.html.parser.Entity;
 import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Base64;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-@ZKMIndy
 public class Naven {
     public static final String CLIENT_NAME = "Naven";
     public static final String CLIENT_DISPLAY_NAME = "Naven-Alpha";
     public static float TICK_TIMER = 1.0F;
     public static int skipTicks;
+
     private static Naven instance;
+
     public boolean canPlaySound = false;
+
     private EventManager eventManager;
     private EventWrapper eventWrapper;
     private ValueManager valueManager;
@@ -57,50 +53,40 @@ public class Naven {
         b(null, null);
     }
 
-    public static EntityHitResult b(Entity entity) {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
+    public static void init() {
+        if (instance != null) {
+            return;
         }
+
         RenderSystem.recordRenderCall(() -> {
             try {
-                new Naven();
-            } catch (Exception var1) {
+                if (instance == null) {
+                    new Naven();
+                }
+            } catch (Exception e) {
                 System.err.println("Failed to load client");
-                var1.printStackTrace(System.err);
+                e.printStackTrace(System.err);
             }
         });
+    }
+
+    public static EntityHitResult b(Entity entity) {
+        init();
         return null;
     }
 
     public static Naven getInstance() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
+        if (instance == null) {
+            init();
         }
         return instance;
     }
 
     public EntityHitResult b(Player player, Exception e) {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
-//        System.out.println("Naven Init");
         instance = this;
+
         this.eventManager = new EventManager();
+
         Window window = Minecraft.getInstance().getWindow();
         SkiaContext.createSurface(window.getWidth(), window.getHeight());
         Shaders.init();
@@ -108,10 +94,8 @@ public class Naven {
 
         try {
             Fonts.loadFonts();
-        } catch (IOException var2) {
-            throw new RuntimeException(var2);
-        } catch (FontFormatException var3) {
-            throw new RuntimeException(var3);
+        } catch (IOException | FontFormatException ex) {
+            throw new RuntimeException(ex);
         }
 
         this.eventWrapper = new EventWrapper();
@@ -122,8 +106,10 @@ public class Naven {
         this.commandManager = new CommandManager();
         this.fileManager = new FileManager();
         this.notificationManager = new NotificationManager();
+
         this.fileManager.load();
         this.moduleManager.getModule(ClickGUIModule.class).setEnabled(false);
+
         this.eventManager.register(getInstance());
         this.eventManager.register(this.eventWrapper);
         this.eventManager.register(new RotationManager());
@@ -131,6 +117,7 @@ public class Naven {
         this.eventManager.register(new ServerUtils());
         this.eventManager.register(new EntityWatcher());
         MinecraftForge.EVENT_BUS.register(this.eventWrapper);
+
         canPlaySound = true;
         SoundUtils.playSound("opening.wav", 1f);
         return null;
@@ -150,110 +137,38 @@ public class Naven {
     }
 
     public EventManager getEventManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.eventManager;
     }
 
     public EventWrapper getEventWrapper() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.eventWrapper;
     }
 
     public ValueManager getValueManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.valueManager;
     }
 
     public HasValueManager getHasValueManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.hasValueManager;
     }
 
     public RotationManager getRotationManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.rotationManager;
     }
 
     public ModuleManager getModuleManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.moduleManager;
     }
 
     public CommandManager getCommandManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.commandManager;
     }
 
     public FileManager getFileManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.fileManager;
     }
 
     public NotificationManager getNotificationManager() {
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
         return this.notificationManager;
     }
 }

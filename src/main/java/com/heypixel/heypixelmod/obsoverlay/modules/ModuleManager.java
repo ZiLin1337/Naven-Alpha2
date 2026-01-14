@@ -11,15 +11,12 @@ import com.heypixel.heypixelmod.obsoverlay.modules.impl.combat.*;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.misc.*;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.move.*;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.render.*;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.ArrayList;
 
 public class ModuleManager {
     private static final Logger log = LogManager.getLogger(ModuleManager.class);
@@ -44,9 +41,6 @@ public class ModuleManager {
     }
 
     public static String getName(String string) {
-        for (String s : AuthUtils.transport.getIgnToUserMap().keySet()) {
-            if (string.contains(s)) string = string.replace(s, s + " §f(§b" + AuthUtils.transport.getName(s) + "§f)");
-        }
         return string;
     }
 
@@ -184,26 +178,11 @@ public class ModuleManager {
 
     @EventTarget
     public void onRespawn(EventRespawn event) {
-        if (AuthUtils.transport != null) AuthUtils.transport.sendInGameUsername();
-        else
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
     }
 
     @EventTarget
     public void onRenderTab(EventRenderTabOverlay e) {
-        if (AuthUtils.transport != null) e.setComponent(Component.literal(getName(e.getComponent().getString())));
-        else
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
+        e.setComponent(Component.literal(getName(e.getComponent().getString())));
     }
 
     public List<Module> getModules() {

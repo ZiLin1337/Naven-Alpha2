@@ -1,11 +1,9 @@
 package com.heypixel.heypixelmod.obsoverlay.utils;
 
-import cn.paradisemc.ZKMIndy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 
-@ZKMIndy
 public class ChatUtils {
     private static final String PREFIX = "§7[§b" + 'N' + "§7] ";
 

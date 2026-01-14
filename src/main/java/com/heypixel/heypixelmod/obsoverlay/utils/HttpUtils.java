@@ -1,6 +1,5 @@
 package com.heypixel.heypixelmod.obsoverlay.utils;
 
-import cn.paradisemc.ZKMIndy;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -8,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
-@ZKMIndy
 public class HttpUtils {
     public static final String DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
 

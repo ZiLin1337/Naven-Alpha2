@@ -11,7 +11,6 @@ import com.heypixel.heypixelmod.obsoverlay.modules.impl.misc.Teams;
 import com.heypixel.heypixelmod.obsoverlay.ui.notification.Notification;
 import com.heypixel.heypixelmod.obsoverlay.ui.notification.NotificationLevel;
 import com.heypixel.heypixelmod.obsoverlay.utils.*;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.Fonts;
 import com.heypixel.heypixelmod.obsoverlay.utils.rotation.RayCastUtil;
 import com.heypixel.heypixelmod.obsoverlay.utils.rotation.RotationManager;
@@ -243,7 +242,7 @@ public class NameTags extends Module {
                     text = text + "§cAiming§f | ";
                 }
                 String name = living.getName().getString();
-                text = text + name + (AuthUtils.transport.isUser(name) ? " §f(§b" + AuthUtils.transport.getName(name) + "§f)" : "");
+                text = text + name;
                 text = text + "§f | §c" + Math.round(hp) + (living.getAbsorptionAmount() > 0.0F ? "+" + Math.round(living.getAbsorptionAmount()) : "") + "HP";
                 float scale = this.scale.getCurrentValue();
                 float width = Fonts.miSans.getWidth(text, scale);

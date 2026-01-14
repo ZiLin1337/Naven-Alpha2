@@ -6,8 +6,6 @@ import com.heypixel.heypixelmod.obsoverlay.events.impl.EventShader;
 import com.heypixel.heypixelmod.obsoverlay.modules.Category;
 import com.heypixel.heypixelmod.obsoverlay.modules.Module;
 import com.heypixel.heypixelmod.obsoverlay.utils.*;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.FuckCracker;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.Fonts;
 import com.heypixel.heypixelmod.obsoverlay.utils.renderer.text.CustomTextRenderer;
 import com.heypixel.heypixelmod.obsoverlay.values.Value;
@@ -241,9 +239,6 @@ public class ClickGUI extends Screen {
                 animation.target = 255.0F;
             }
         });
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            Multithreading.runAsync(FuckCracker::fuckCracker);
-        }
     }
 
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {

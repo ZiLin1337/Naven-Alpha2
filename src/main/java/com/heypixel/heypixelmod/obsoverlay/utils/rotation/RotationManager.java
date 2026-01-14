@@ -5,15 +5,12 @@ import com.heypixel.heypixelmod.obsoverlay.events.api.types.EventType;
 import com.heypixel.heypixelmod.obsoverlay.events.api.types.Priority;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.*;
 import com.heypixel.heypixelmod.obsoverlay.utils.MoveUtils;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot;
 import net.minecraft.util.Mth;
 
-import java.lang.reflect.Method;
-import java.util.Base64;
 import java.util.function.Function;
 
 public class RotationManager {
@@ -29,15 +26,6 @@ public class RotationManager {
 
     public static void setRotations(final Rotation rotations, final double rotationSpeed) {
         setRotations(rotations, rotationSpeed, null);
-
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
     }
 
     public static void setRotations(final Rotation rotations, final double rotationSpeed, final Function<Rotation, Boolean> raycast) {
