@@ -7,7 +7,6 @@ import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRunTicks;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventShutdown;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.render.Glow;
 import com.heypixel.heypixelmod.obsoverlay.utils.AnimationUtils;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthInit;
 import com.heypixel.heypixelmod.obsoverlay.utils.shader.impl.KawaseBlur;
 import com.heypixel.heypixelmod.obsoverlay.utils.skia.context.SkiaContext;
 import com.mojang.blaze3d.platform.Window;
@@ -41,7 +40,7 @@ public class MixinMinecraft {
             at = {@At("TAIL")}
     )
     private void onInit(CallbackInfo info) {
-        new AuthInit();
+        Naven.init();
     }
 
     @Inject(

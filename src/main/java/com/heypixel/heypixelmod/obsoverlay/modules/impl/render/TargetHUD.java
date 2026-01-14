@@ -11,7 +11,6 @@ import com.heypixel.heypixelmod.obsoverlay.modules.ModuleInfo;
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.combat.KillAura;
 import com.heypixel.heypixelmod.obsoverlay.ui.HUDEditor;
 import com.heypixel.heypixelmod.obsoverlay.utils.SmoothAnimationTimer;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import com.heypixel.heypixelmod.obsoverlay.utils.skia.Skia;
 import com.heypixel.heypixelmod.obsoverlay.utils.skia.font.Fonts;
 import com.heypixel.heypixelmod.obsoverlay.values.ValueBuilder;
@@ -60,7 +59,6 @@ public class TargetHUD extends Module {
         Font iconFill = Fonts.getIconFill(10.0f);
         float heartIconWidth = iconFill.measureTextWidth("\ue87d");
         String name = target.getName().getString();
-        name = name + (AuthUtils.transport.isUser(name) ? " §f(§b" + AuthUtils.transport.getName(name) + "§f)" : "");
         float nameWidth = Skia.getStringWidth(name, miSans);
         float healBarWidth = (nameWidth + 45.0f > width) ? nameWidth : 78.0f;
         if (nameWidth + 45.0f > width) width = nameWidth + 45.0f;

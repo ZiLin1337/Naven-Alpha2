@@ -2,32 +2,17 @@ package com.heypixel.heypixelmod.obsoverlay.ui.notification;
 
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRenderSkia;
 import com.heypixel.heypixelmod.obsoverlay.utils.SmoothAnimationTimer;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import com.heypixel.heypixelmod.obsoverlay.utils.skia.Skia;
 import com.heypixel.heypixelmod.obsoverlay.values.impl.DragValue;
 import io.github.humbleui.skija.ClipMode;
 import io.github.humbleui.skija.Path;
 import io.github.humbleui.types.Rect;
 
-import java.lang.reflect.Method;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NotificationManager {
     private final List<Notification> notifications = new CopyOnWriteArrayList<>();
-
-    public NotificationManager() {
-
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
-    }
 
     public void addNotification(Notification notification) {
         if (!this.notifications.contains(notification)) {

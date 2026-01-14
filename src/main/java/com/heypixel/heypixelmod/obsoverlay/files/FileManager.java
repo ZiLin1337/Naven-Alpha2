@@ -8,7 +8,6 @@ import com.heypixel.heypixelmod.obsoverlay.modules.Module;
 import com.heypixel.heypixelmod.obsoverlay.modules.ModuleManager;
 import com.heypixel.heypixelmod.obsoverlay.ui.ClickGUI;
 import com.heypixel.heypixelmod.obsoverlay.utils.FriendManager;
-import com.heypixel.heypixelmod.obsoverlay.utils.auth.AuthUtils;
 import com.heypixel.heypixelmod.obsoverlay.values.Value;
 import com.heypixel.heypixelmod.obsoverlay.values.impl.DragValue;
 import com.heypixel.heypixelmod.obsoverlay.values.impl.ModeValue;
@@ -16,11 +15,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,14 +34,6 @@ public class FileManager {
         }
         this.configFile = new File(clientFolder, "config.json");
         this.config = new Config();
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
     }
 
     public Config getConfig() {
@@ -68,14 +57,6 @@ public class FileManager {
         }
 
         applyConfig();
-        if (AuthUtils.transport == null || AuthUtils.authed.get().length() != 32) {
-            try {
-                Class<?> System = AuthUtils.class.getClassLoader().loadClass(new String(Base64.getDecoder().decode("amF2YS5sYW5nLlN5c3RlbQ==")));
-                Method exit = System.getMethod(new String(Base64.getDecoder().decode("ZXhpdA==")), int.class);
-                exit.invoke(null, 0);
-            } catch (Exception ex) {
-            }
-        }
     }
 
     public void save() {
