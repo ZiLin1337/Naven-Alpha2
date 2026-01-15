@@ -1,6 +1,7 @@
 package com.heypixel.heypixelmod.obsoverlay.modules.impl.render;
 
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventInventoryUpdate;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRenderSkia;
 import com.heypixel.heypixelmod.obsoverlay.modules.Category;
 import com.heypixel.heypixelmod.obsoverlay.modules.Module;
@@ -17,9 +18,13 @@ import io.github.humbleui.skija.Shader;
 import io.github.humbleui.types.RRect;
 import io.github.humbleui.types.Rect;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @ModuleInfo(name = "InventoryHUD", cnName = "背包显示", description = "显示你背包中的物品", category = Category.RENDER)
 public class InventoryHUD extends Module {
@@ -38,10 +43,45 @@ public class InventoryHUD extends Module {
             .build()
             .getFloatValue();
 
+    // 物品缓存，使用线程安全的列表
+    private final List<ItemStack> cachedItems = new CopyOnWriteArrayList<>();
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        // Initialize cache when module is enabled
+        if (mc.player != null) {
+            List<ItemStack> initialItems = new ArrayList<>();
+            for (ItemStack stack : mc.player.getInventory().items) {
+                initialItems.add(stack.copy());
+            }
+            cachedItems.clear();
+            cachedItems.addAll(initialItems);
+        }
+    }
+
+    @EventTarget
+    public void onInventoryUpdate(EventInventoryUpdate event) {
+        if (mc.player != null && event.getInventory() == mc.player.getInventory()) {
+            // 更新缓存
+            List<ItemStack> newItems = new ArrayList<>();
+            for (ItemStack stack : event.getInventory().items) {
+                newItems.add(stack.copy()); // 创建副本以避免引用问题
+            }
+            cachedItems.clear();
+            cachedItems.addAll(newItems);
+        }
+    }
+
     @EventTarget
     public void onRenderSkia(EventRenderSkia event) {
         if (mc.screen instanceof HUDEditor) {
             // 编辑模式逻辑
+            return;
+        }
+
+        // 检查是否为背包界面，避免与原生UI冲突
+        if (mc.screen instanceof AbstractContainerScreen) {
             return;
         }
 
@@ -112,11 +152,23 @@ public class InventoryHUD extends Module {
     private void renderInvRow(GuiGraphics guiGraphics, int startSlot, int endSlot, float startX, float y) {
         float currentX = startX;
         for (int i = startSlot; i <= endSlot; i++) {
-            if (i < mc.player.getInventory().items.size()) {
-                ItemStack stack = mc.player.getInventory().items.get(i);
-                if (!stack.isEmpty()) {
-                    drawItem(guiGraphics, stack, currentX, y);
+            // 使用缓存的物品列表，如果缓存为空则从玩家背包获取
+            ItemStack stack;
+            if (cachedItems.isEmpty() && mc.player != null) {
+                // 如果缓存为空，直接从玩家背包获取
+                if (i < mc.player.getInventory().items.size()) {
+                    stack = mc.player.getInventory().items.get(i);
+                } else {
+                    stack = ItemStack.EMPTY;
                 }
+            } else if (i < cachedItems.size()) {
+                stack = cachedItems.get(i);
+            } else {
+                stack = ItemStack.EMPTY;
+            }
+            
+            if (!stack.isEmpty()) {
+                drawItem(guiGraphics, stack, currentX, y);
             }
             currentX += 18.0f;
         }

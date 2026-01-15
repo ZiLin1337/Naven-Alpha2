@@ -2,6 +2,7 @@ package com.heypixel.heypixelmod.mixin.O;
 
 import com.heypixel.heypixelmod.obsoverlay.Naven;
 import com.heypixel.heypixelmod.obsoverlay.events.api.types.EventType;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventInventoryUpdate;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventMotion;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventSlowdown;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventUpdate;
@@ -11,6 +12,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
+import java.util.List;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot;
@@ -31,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin({LocalPlayer.class})
 public abstract class MixinLocalPlayer extends AbstractClientPlayer {
+    private int lastInventoryHash = 0;
     @Shadow
     @Final
     public ClientPacketListener connection;
@@ -78,6 +82,15 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer {
     )
     public void injectUpdateEvent(CallbackInfo ci) {
         Naven.getInstance().getEventManager().call(new EventUpdate());
+        
+        // Check for inventory changes
+        if (this.getInventory() != null) {
+            int currentHash = this.getInventory().items.hashCode();
+            if (lastInventoryHash != 0 && lastInventoryHash != currentHash) {
+                Naven.getInstance().getEventManager().call(new EventInventoryUpdate(this.getInventory(), -1));
+            }
+            lastInventoryHash = currentHash;
+        }
     }
 
     /**
