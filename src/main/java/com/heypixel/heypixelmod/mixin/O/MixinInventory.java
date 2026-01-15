@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Inventory.class)
 public class MixinInventory {
@@ -25,7 +26,7 @@ public class MixinInventory {
             method = {"removeItem"},
             at = @At("RETURN")
     )
-    private void onRemoveItem(int slot, int amount, CallbackInfo ci) {
+    private void onRemoveItem(int slot, int amount, CallbackInfoReturnable<ItemStack> cir) {
         Inventory inventory = (Inventory) (Object) this;
         Naven.getInstance().getEventManager().call(new EventInventoryUpdate(inventory, slot));
     }
