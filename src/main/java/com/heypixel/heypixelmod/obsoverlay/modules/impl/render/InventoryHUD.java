@@ -3,6 +3,7 @@ package com.heypixel.heypixelmod.obsoverlay.modules.impl.render;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventInventoryUpdate;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRenderSkia;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventUpdate;
 import com.heypixel.heypixelmod.obsoverlay.modules.Category;
 import com.heypixel.heypixelmod.obsoverlay.modules.Module;
 import com.heypixel.heypixelmod.obsoverlay.modules.ModuleInfo;
@@ -22,7 +23,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -43,33 +43,43 @@ public class InventoryHUD extends Module {
             .build()
             .getFloatValue();
 
-    // 物品缓存，使用线程安全的列表
+    // 物品缓存，使用线程安全的列表（只缓存主背包槽位9-35）
     private final List<ItemStack> cachedItems = new CopyOnWriteArrayList<>();
+    private boolean initialized = false;
 
     @Override
     public void onEnable() {
         super.onEnable();
-        // Initialize cache when module is enabled
-        if (mc.player != null) {
-            List<ItemStack> initialItems = new ArrayList<>();
-            for (ItemStack stack : mc.player.getInventory().items) {
-                initialItems.add(stack.copy());
-            }
-            cachedItems.clear();
-            cachedItems.addAll(initialItems);
-        }
+        initialized = false;
+        cachedItems.clear();
     }
 
     @EventTarget
     public void onInventoryUpdate(EventInventoryUpdate event) {
         if (mc.player != null && event.getInventory() == mc.player.getInventory()) {
-            // 更新缓存
-            List<ItemStack> newItems = new ArrayList<>();
-            for (ItemStack stack : event.getInventory().items) {
-                newItems.add(stack.copy()); // 创建副本以避免引用问题
-            }
+            // 只缓存主背包槽位（9-35）
             cachedItems.clear();
-            cachedItems.addAll(newItems);
+            try {
+                for (int i = 9; i <= 35; i++) {
+                    if (i < mc.player.getInventory().items.size()) {
+                        cachedItems.add(mc.player.getInventory().items.get(i).copy());
+                    } else {
+                        cachedItems.add(ItemStack.EMPTY);
+                    }
+                }
+            } catch (Exception e) {
+                // 发生异常时清空缓存
+                cachedItems.clear();
+            }
+        }
+    }
+
+    @EventTarget
+    public void onUpdate(EventUpdate event) {
+        // 在游戏更新时确保缓存是最新的
+        if (mc.player != null && !initialized) {
+            initializeCache();
+            initialized = true;
         }
     }
 
@@ -132,6 +142,12 @@ public class InventoryHUD extends Module {
 
         // 4. 物品绘制 (GuiGraphics)
         if (mc.player != null) {
+            // 首次初始化缓存
+            if (!initialized) {
+                initializeCache();
+                initialized = true;
+            }
+            
             GuiGraphics guiGraphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
 
             float itemStartX = x + 6.0f;
@@ -149,20 +165,38 @@ public class InventoryHUD extends Module {
         dragValue.setHeight(height);
     }
 
+    private void initializeCache() {
+        if (mc.player == null) return;
+        
+        try {
+            cachedItems.clear();
+            // 只缓存主背包槽位 9-35（不包括快捷栏和合成栏）
+            for (int i = 9; i <= 35; i++) {
+                if (i < mc.player.getInventory().items.size()) {
+                    cachedItems.add(mc.player.getInventory().items.get(i).copy());
+                } else {
+                    cachedItems.add(ItemStack.EMPTY);
+                }
+            }
+        } catch (Exception e) {
+            // 初始化失败，清空缓存以避免显示错误数据
+            cachedItems.clear();
+        }
+    }
+
     private void renderInvRow(GuiGraphics guiGraphics, int startSlot, int endSlot, float startX, float y) {
         float currentX = startX;
         for (int i = startSlot; i <= endSlot; i++) {
-            // 使用缓存的物品列表，如果缓存为空则从玩家背包获取
+            // 正确计算缓存索引：槽位9对应缓存索引0
+            int cacheIndex = i - 9;
             ItemStack stack;
-            if (cachedItems.isEmpty() && mc.player != null) {
-                // 如果缓存为空，直接从玩家背包获取
-                if (i < mc.player.getInventory().items.size()) {
-                    stack = mc.player.getInventory().items.get(i);
-                } else {
-                    stack = ItemStack.EMPTY;
-                }
-            } else if (i < cachedItems.size()) {
-                stack = cachedItems.get(i);
+            
+            if (cacheIndex >= 0 && cacheIndex < cachedItems.size()) {
+                // 从缓存获取物品
+                stack = cachedItems.get(cacheIndex);
+            } else if (mc.player != null && i < mc.player.getInventory().items.size()) {
+                // 缓存失效时的安全回退
+                stack = mc.player.getInventory().items.get(i);
             } else {
                 stack = ItemStack.EMPTY;
             }
@@ -175,12 +209,15 @@ public class InventoryHUD extends Module {
     }
 
     private void drawItem(GuiGraphics guiGraphics, ItemStack stack, float x, float y) {
+        if (stack == null || stack.isEmpty()) return;
+        
         guiGraphics.pose().pushPose();
         try {
             guiGraphics.renderItem(stack, (int) x, (int) y);
             guiGraphics.renderItemDecorations(mc.font, stack, (int) x, (int) y);
         } catch (Exception e) {
-            e.printStackTrace();
+            // 渲染失败时输出错误但不导致崩溃
+            System.err.println("[InventoryHUD] 物品渲染失败: " + e.getMessage());
         } finally {
             guiGraphics.pose().popPose();
         }
