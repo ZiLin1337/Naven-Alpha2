@@ -1,0 +1,31 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Build was configured to prefer settings repositories over project repositories but repository 'LoomLocalRemappedMods' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Build was configured to prefer settings repositories over project repositories but repository 'LoomGlobalMinecraft' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Build was configured to prefer settings repositories over project repositories but repository 'LoomLocalMinecraft' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Build was configured to prefer settings repositories over project repositories but repository 'Fabric' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Build was configured to prefer settings repositories over project repositories but repository 'Mojang' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Build was configured to prefer settings repositories over project repositories but repository 'MavenRepo' was added by plugin class 'net.fabricmc.loom.LoomRepositoryPlugin'
+Fabric Loom: 1.5.7
+Build was configured to prefer settings repositories over project repositories but repository 'Fabric2' was added by build file 'build.gradle'
+Build was configured to prefer settings repositories over project repositories but repository 'Sponge' was added by build file 'build.gradle'
+Build was configured to prefer settings repositories over project repositories but repository 'MavenRepo2' was added by build file 'build.gradle'
+Found existing cache lock file, rebuilding loom cache. This may have been caused by a failed or canceled build.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'Naven-Alpha'.
+> Failed to notify project evaluation listener.
+   > Failed to setup Minecraft, java.lang.RuntimeException: Unexpected IllegalAccessException occurred (Gson 2.9.1). Certain ReflectionAccessFilter features require Java >= 9 to work correctly. If you are not using ReflectionAccessFilter, report this to the Gson maintainers.
+   > Unexpected IllegalAccessException occurred (Gson 2.9.1). Certain ReflectionAccessFilter features require Java >= 9 to work correctly. If you are not using ReflectionAccessFilter, report this to the Gson maintainers.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 13s
