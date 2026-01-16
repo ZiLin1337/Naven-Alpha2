@@ -1,10 +1,14 @@
 plugins {
-    // 升级为 1.8.11，完美适配 MC 1.20.6，彻底解决 Gson 兼容性问题
-    id 'fabric-loom' version '1.8.11'
+    // 使用最稳定的版本避免Gson问题
+    id 'fabric-loom' version '1.7.3'
     id 'maven-publish'
     id 'eclipse'
     id 'idea'
 }
+
+// 在配置阶段强制设置Gson反射访问过滤器禁用
+System.setProperty('com.google.code.gson.ReflectionAccessFilter', 'DISABLED')
+System.setProperty('com.google.gson.ReflectionAccessFilter', 'DISABLED')
 
 group = mod_group_id
 version = mod_version

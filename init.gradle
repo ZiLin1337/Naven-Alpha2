@@ -1,4 +1,11 @@
+// 在最早期阶段强制设置环境变量来绕过Gson反射限制
+gradle.startParameter.systemPropertiesArgs.put('com.google.code.gson.ReflectionAccessFilter', 'DISABLED')
+gradle.startParameter.systemPropertiesArgs.put('com.google.gson.ReflectionAccessFilter', 'DISABLED')
+
 allprojects {
+    gradle.startParameter.systemPropertiesArgs.put('com.google.code.gson.ReflectionAccessFilter', 'DISABLED')
+    gradle.startParameter.systemPropertiesArgs.put('com.google.gson.ReflectionAccessFilter', 'DISABLED')
+    
     configurations.all {
         resolutionStrategy {
             force 'com.google.code.gson:gson:2.11.0'
