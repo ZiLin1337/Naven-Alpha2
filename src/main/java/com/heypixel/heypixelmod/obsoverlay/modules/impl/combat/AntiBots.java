@@ -13,12 +13,13 @@ import com.heypixel.heypixelmod.obsoverlay.values.ValueBuilder;
 import com.heypixel.heypixelmod.obsoverlay.values.impl.FloatValue;
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
-import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 
 import java.util.HashSet;
@@ -113,12 +114,12 @@ public class AntiBots extends Module {
                         }
                     }
                 }
-            } else if (e.getPacket() instanceof ClientboundAddPlayerPacket packet) {
-                if (uuids.containsKey(packet.getPlayerId())) {
-                    String displayName = uuidDisplayNames.get(packet.getPlayerId());
-                    entityIdDisplayNames.put(packet.getEntityId(), displayName);
-                    uuids.remove(packet.getPlayerId());
-                    ids.add(packet.getEntityId());
+            } else if (e.getPacket() instanceof ClientboundAddEntityPacket packet && packet.getType() == EntityType.PLAYER) {
+                if (uuids.containsKey(packet.getUUID())) {
+                    String displayName = uuidDisplayNames.get(packet.getUUID());
+                    entityIdDisplayNames.put(packet.getId(), displayName);
+                    uuids.remove(packet.getUUID());
+                    ids.add(packet.getId());
                 }
             } else if (e.getPacket() instanceof ClientboundRemoveEntitiesPacket packet) {
                 IntListIterator var9 = packet.getEntityIds().iterator();

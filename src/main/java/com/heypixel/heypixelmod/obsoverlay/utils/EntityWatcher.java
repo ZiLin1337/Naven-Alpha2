@@ -14,7 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import java.util.LinkedHashSet;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +28,7 @@ public class EntityWatcher {
     public static Set<String> getEntityTags(AbstractClientPlayer player) {
         List<MobEffect> effects = PotionResolver.resolve(player.getEntityData().get(LivingEntityAccessor.getEffectColorId()));
         effects.remove(MobEffects.ABSORPTION);
-        Set<String> currentPlayerTags = new OrderedHashSet();
+        Set<String> currentPlayerTags = new LinkedHashSet<>();
         if (tags.containsKey(player)) {
             currentPlayerTags.addAll(tags.get(player));
         }
