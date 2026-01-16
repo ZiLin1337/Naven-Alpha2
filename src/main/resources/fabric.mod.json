@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "naven-alpha",
+  "version": "${version}",
+  "name": "Naven-Alpha",
+  "description": "Advanced Minecraft client mod",
+  "authors": [
+    "jiuxian_baka"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": "",
+    "issues": ""
+  },
+  "license": "All Rights Reserved",
+  "icon": "assets/naven-alpha/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "tech.naven.NavenModLoaderFabric"
+    ],
+    "client": [
+      "tech.naven.NavenClientEntrypoint"
+    ]
+  },
+  "mixins": [
+    "naven-alpha.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "1.20.6",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

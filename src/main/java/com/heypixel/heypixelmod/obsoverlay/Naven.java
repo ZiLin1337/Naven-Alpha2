@@ -4,6 +4,7 @@ import com.heypixel.heypixelmod.obsoverlay.commands.CommandManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
 import com.heypixel.heypixelmod.obsoverlay.events.api.types.EventType;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventClientChat;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRunTicks;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventShutdown;
 import com.heypixel.heypixelmod.obsoverlay.files.FileManager;
@@ -19,12 +20,10 @@ import com.heypixel.heypixelmod.obsoverlay.utils.skia.context.SkiaContext;
 import com.heypixel.heypixelmod.obsoverlay.values.HasValueManager;
 import com.heypixel.heypixelmod.obsoverlay.values.ValueManager;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.awt.*;
 import java.io.IOException;
@@ -36,6 +35,8 @@ public class Naven {
     public static int skipTicks;
 
     private static Naven instance;
+
+    private boolean initialized;
 
     public boolean canPlaySound = false;
 
@@ -50,40 +51,24 @@ public class Naven {
     private NotificationManager notificationManager;
 
     private Naven() {
-        b(null, null);
     }
 
     public static void init() {
-        if (instance != null) {
-            return;
-        }
-
-        RenderSystem.recordRenderCall(() -> {
-            try {
-                if (instance == null) {
-                    new Naven();
-                }
-            } catch (Exception e) {
-                System.err.println("Failed to load client");
-                e.printStackTrace(System.err);
-            }
-        });
-    }
-
-    public static EntityHitResult b(Entity entity) {
-        init();
-        return null;
+        getInstance().initialize();
     }
 
     public static Naven getInstance() {
         if (instance == null) {
-            init();
+            instance = new Naven();
         }
         return instance;
     }
 
-    public EntityHitResult b(Player player, Exception e) {
-        instance = this;
+    public synchronized void initialize() {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
 
         this.eventManager = new EventManager();
 
@@ -110,17 +95,47 @@ public class Naven {
         this.fileManager.load();
         this.moduleManager.getModule(ClickGUIModule.class).setEnabled(false);
 
-        this.eventManager.register(getInstance());
+        this.eventManager.register(this);
         this.eventManager.register(this.eventWrapper);
-        this.eventManager.register(new RotationManager());
+        this.eventManager.register(this.rotationManager);
         this.eventManager.register(new NetworkUtils());
         this.eventManager.register(new ServerUtils());
         this.eventManager.register(new EntityWatcher());
-        MinecraftForge.EVENT_BUS.register(this.eventWrapper);
+
+        registerFabricCallbacks();
 
         canPlaySound = true;
         SoundUtils.playSound("opening.wav", 1f);
-        return null;
+    }
+
+    private void registerFabricCallbacks() {
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (this.eventManager != null) {
+                this.eventManager.call(new EventRunTicks(EventType.PRE));
+            }
+        });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (this.eventManager != null) {
+                this.eventManager.call(new EventRunTicks(EventType.POST));
+            }
+        });
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            if (this.eventManager != null) {
+                this.eventManager.call(new EventShutdown());
+            }
+        });
+
+        ClientSendMessageEvents.ALLOW_CHAT.register(message -> {
+            if (this.eventManager == null) {
+                return true;
+            }
+
+            EventClientChat event = new EventClientChat(message);
+            this.eventManager.call(event);
+            return !event.isCancelled();
+        });
     }
 
     @EventTarget
