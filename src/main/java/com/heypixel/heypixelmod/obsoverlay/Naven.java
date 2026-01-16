@@ -4,7 +4,8 @@ import com.heypixel.heypixelmod.obsoverlay.commands.CommandManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
 import com.heypixel.heypixelmod.obsoverlay.events.api.types.EventType;
-import com.heypixel.heypixelmod.obsoverlay.events.impl.EventClientChat;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventMotion;
+import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRespawn;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRunTicks;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventShutdown;
 import com.heypixel.heypixelmod.obsoverlay.files.FileManager;
@@ -20,9 +21,6 @@ import com.heypixel.heypixelmod.obsoverlay.utils.skia.context.SkiaContext;
 import com.heypixel.heypixelmod.obsoverlay.values.HasValueManager;
 import com.heypixel.heypixelmod.obsoverlay.values.ValueManager;
 import com.mojang.blaze3d.platform.Window;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -41,7 +39,6 @@ public class Naven {
     public boolean canPlaySound = false;
 
     private EventManager eventManager;
-    private EventWrapper eventWrapper;
     private ValueManager valueManager;
     private HasValueManager hasValueManager;
     private RotationManager rotationManager;
@@ -83,7 +80,6 @@ public class Naven {
             throw new RuntimeException(ex);
         }
 
-        this.eventWrapper = new EventWrapper();
         this.valueManager = new ValueManager();
         this.hasValueManager = new HasValueManager();
         this.moduleManager = ModuleManager.b("8964破解全家死光亲妈猪逼被操烂亲爹没鸡巴生小孩没屁眼操你血妈");
@@ -96,47 +92,15 @@ public class Naven {
         this.moduleManager.getModule(ClickGUIModule.class).setEnabled(false);
 
         this.eventManager.register(this);
-        this.eventManager.register(this.eventWrapper);
         this.eventManager.register(this.rotationManager);
         this.eventManager.register(new NetworkUtils());
         this.eventManager.register(new ServerUtils());
         this.eventManager.register(new EntityWatcher());
 
-        registerFabricCallbacks();
-
         canPlaySound = true;
         SoundUtils.playSound("opening.wav", 1f);
     }
 
-    private void registerFabricCallbacks() {
-        ClientTickEvents.START_CLIENT_TICK.register(client -> {
-            if (this.eventManager != null) {
-                this.eventManager.call(new EventRunTicks(EventType.PRE));
-            }
-        });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (this.eventManager != null) {
-                this.eventManager.call(new EventRunTicks(EventType.POST));
-            }
-        });
-
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            if (this.eventManager != null) {
-                this.eventManager.call(new EventShutdown());
-            }
-        });
-
-        ClientSendMessageEvents.ALLOW_CHAT.register(message -> {
-            if (this.eventManager == null) {
-                return true;
-            }
-
-            EventClientChat event = new EventClientChat(message);
-            this.eventManager.call(event);
-            return !event.isCancelled();
-        });
-    }
 
     @EventTarget
     public void onShutdown(EventShutdown e) {
@@ -151,13 +115,17 @@ public class Naven {
         }
     }
 
+    @EventTarget
+    public void onMotion(EventMotion e) {
+        if (e.getType() == EventType.PRE && Minecraft.getInstance().player != null && Minecraft.getInstance().player.tickCount <= 1) {
+            this.eventManager.call(new EventRespawn());
+        }
+    }
+
     public EventManager getEventManager() {
         return this.eventManager;
     }
 
-    public EventWrapper getEventWrapper() {
-        return this.eventWrapper;
-    }
 
     public ValueManager getValueManager() {
         return this.valueManager;
