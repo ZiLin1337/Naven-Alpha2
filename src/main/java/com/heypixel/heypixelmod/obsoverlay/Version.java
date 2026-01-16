@@ -2,6 +2,6 @@ package com.heypixel.heypixelmod.obsoverlay;
 
 public class Version {
     public static String getVersion() {
-        return "build-260114";
+        return "build-260116";
     }
 }

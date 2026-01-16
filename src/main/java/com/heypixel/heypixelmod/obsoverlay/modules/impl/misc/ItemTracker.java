@@ -17,7 +17,7 @@ import com.heypixel.heypixelmod.obsoverlay.values.impl.BooleanValue;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.Entity;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import java.util.LinkedHashSet;
 
 import java.awt.*;
 import java.util.List;
@@ -94,7 +94,7 @@ public class ItemTracker extends Module {
 
             if (this.debug.getCurrentValue() && info.getPlayer() != null) {
                 AbstractClientPlayer player = info.getPlayer();
-                OrderedHashSet<String> debugInfos = new OrderedHashSet();
+                LinkedHashSet<String> debugInfos = new LinkedHashSet<>();
                 debugInfos.add("X: " + player.getX());
                 debugInfos.add("Y: " + player.getY());
                 debugInfos.add("Z: " + player.getZ());
