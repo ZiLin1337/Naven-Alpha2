@@ -24,12 +24,13 @@ loom {
     }
 }
 
-dependencies {
-    // Loom 1.7.2内部已兼容Gson，无需手动配置插件级Gson，保留项目级兜底即可
-    configurations.all {
-        resolutionStrategy.force 'com.google.code.gson:gson:2.11.0'
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.code.gson:gson:2.11.0'
     }
+}
 
+dependencies {
     // 原有依赖配置，完全保留
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
