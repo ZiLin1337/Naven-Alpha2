@@ -1,6 +1,6 @@
 plugins {
-    // 升级为1.7.2，完美适配MC 1.20.6，内部解决Gson 2.9.1反射异常
-    id 'fabric-loom' version '1.7.2'
+    // 升级为 1.8.11，完美适配 MC 1.20.6，彻底解决 Gson 兼容性问题
+    id 'fabric-loom' version '1.8.11'
     id 'maven-publish'
     id 'eclipse'
     id 'idea'
