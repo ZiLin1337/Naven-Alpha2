@@ -192,7 +192,7 @@ public class RotationManager {
     public void onPositionItem(EventPositionItem e) {
         if (active && rotations != null) {
             PosRot packet = (PosRot) e.getPacket();
-            PosRot newPacket = new PosRot(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0), rotations.getYaw(), rotations.getYaw(), packet.isOnGround());
+            PosRot newPacket = new PosRot(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0), rotations.getYaw(), rotations.getPitch(), packet.isOnGround());
             e.setPacket(newPacket);
         }
     }

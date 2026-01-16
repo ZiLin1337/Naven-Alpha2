@@ -21,6 +21,8 @@ import io.github.humbleui.types.Rect;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @ModuleInfo(name = "InventoryHUD", cnName = "背包显示", description = "显示你背包中的物品", category = Category.RENDER)
 public class InventoryHUD extends Module {
+    private static final Logger log = LogManager.getLogger(InventoryHUD.class);
 
     private final DragValue dragValue = ValueBuilder.create(this, "Position")
             .setDefaultX(200f)
@@ -217,7 +220,7 @@ public class InventoryHUD extends Module {
             guiGraphics.renderItemDecorations(mc.font, stack, (int) x, (int) y);
         } catch (Exception e) {
             // 渲染失败时输出错误但不导致崩溃
-            System.err.println("[InventoryHUD] 物品渲染失败: " + e.getMessage());
+            log.error("[InventoryHUD] 物品渲染失败: {}", e.getMessage());
         } finally {
             guiGraphics.pose().popPose();
         }

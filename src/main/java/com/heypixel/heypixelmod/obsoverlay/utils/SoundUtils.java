@@ -1,6 +1,8 @@
 package com.heypixel.heypixelmod.obsoverlay.utils;
 
 import com.heypixel.heypixelmod.obsoverlay.Naven;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -12,6 +14,7 @@ import java.io.IOException;
  * @Filename：SoundUtils
  */
 public class SoundUtils {
+    private static final Logger log = LogManager.getLogger(SoundUtils.class);
 
     public static void playSound(String path, float volume) {
         if (!Naven.getInstance().canPlaySound) return;
@@ -30,7 +33,7 @@ public class SoundUtils {
 
                 clip.start();
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-                e.printStackTrace();
+                log.error("Error playing sound: {}", path, e);
             }
         }));
     }

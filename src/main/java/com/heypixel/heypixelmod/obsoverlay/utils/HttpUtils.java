@@ -1,6 +1,8 @@
 package com.heypixel.heypixelmod.obsoverlay.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -8,6 +10,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class HttpUtils {
+    private static final Logger log = LogManager.getLogger(HttpUtils.class);
     public static final String DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
 
     public HttpUtils() {
@@ -39,10 +42,10 @@ public class HttpUtils {
             bufferedReader.close();
             return stringBuilder.toString();
         } catch (SocketTimeoutException var7) {
-            System.err.println("Read timed out");
+            log.error("Read timed out for URL (multi-line): {}", url);
             return null;
         } catch (IOException var8) {
-            System.err.println("Error while making request");
+            log.error("Error while making request to URL (multi-line): {}", url, var8);
             return null;
         }
     }
@@ -61,10 +64,10 @@ public class HttpUtils {
             bufferedReader.close();
             return stringBuilder.toString();
         } catch (SocketTimeoutException var7) {
-            System.err.println("Read timed out");
+            log.error("Read timed out for URL (single-line): {}", url);
             return null;
         } catch (IOException var8) {
-            System.err.println("Error while making request");
+            log.error("Error while making request to URL (single-line): {}", url, var8);
             return null;
         }
     }

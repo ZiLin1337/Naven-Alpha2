@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.io.*;
@@ -17,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ImageHelper {
+    private static final Logger log = LogManager.getLogger(ImageHelper.class);
 
     private final Map<String, Image> images = new HashMap<>();
     private final Map<Integer, Image> textures = new HashMap<>();
@@ -49,10 +52,10 @@ public class ImageHelper {
                     images.put(ResourceLocation.getPath(), image);
                     return true;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Failed to read image data from resource: {}", ResourceLocation, e);
                 }
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("Image resource not found: {}", ResourceLocation, e);
             }
 
 
@@ -82,7 +85,7 @@ public class ImageHelper {
                 images.put(file.getName(), Image.makeDeferredFromEncodedBytes(encoded));
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Failed to load image from file: {}", file.getAbsolutePath(), e);
                 return false;
             }
         }
