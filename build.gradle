@@ -1,5 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    // 升级为1.7.2，完美适配MC 1.20.6，内部解决Gson 2.9.1反射异常
+    id 'fabric-loom' version '1.7.2'
     id 'maven-publish'
     id 'eclipse'
     id 'idea'
@@ -17,18 +18,6 @@ java {
     withSourcesJar()
 }
 
-repositories {
-    maven {
-        name = 'Fabric'
-        url = 'https://maven.fabricmc.net/'
-    }
-    maven {
-        name = 'Sponge'
-        url = 'https://repo.spongepowered.org/repository/maven-public/'
-    }
-    mavenCentral()
-}
-
 loom {
     mixin {
         defaultRefmapName.set('naven-alpha.refmap.json')
@@ -36,11 +25,14 @@ loom {
 }
 
 dependencies {
+    // Loom 1.7.2内部已兼容Gson，无需手动配置插件级Gson，保留项目级兜底即可
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.gson:gson:2.10.1'
+    }
+
+    // 原有依赖配置，完全保留
     minecraft "com.mojang:minecraft:${minecraft_version}"
-
-    // The sources are currently written against Mojang official names (Mojmap)
     mappings loom.officialMojangMappings()
-
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
@@ -52,19 +44,15 @@ dependencies {
     // Skija
     implementation 'io.github.humbleui:types:0.2.0'
     include 'io.github.humbleui:types:0.2.0'
-
     implementation 'io.github.humbleui:skija-shared:0.116.4'
     include 'io.github.humbleui:skija-shared:0.116.4'
-
     implementation 'io.github.humbleui:skija-linux-x64:0.116.4'
     include 'io.github.humbleui:skija-linux-x64:0.116.4'
-
     implementation 'io.github.humbleui:skija-windows-x64:0.116.4'
     include 'io.github.humbleui:skija-windows-x64:0.116.4'
 
     compileOnly "org.projectlombok:lombok:1.18.42"
     annotationProcessor "org.projectlombok:lombok:1.18.42"
-
     testCompileOnly "org.projectlombok:lombok:1.18.42"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.42"
 }
@@ -102,7 +90,6 @@ tasks.register('updateVersion') {
             def dateStr = new Date().format('yyMMdd')
             def content = versionFile.text
             def newContent = content.replaceAll(/return \"build-\d+\";/, "return \"build-${dateStr}\";")
-
             if (content != newContent) {
                 versionFile.text = newContent
                 println "Updated Version.java to build-${dateStr}"
