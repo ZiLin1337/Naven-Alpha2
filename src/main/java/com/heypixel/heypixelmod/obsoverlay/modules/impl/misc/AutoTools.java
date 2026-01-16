@@ -87,7 +87,7 @@ public class AutoTools extends Module {
                     && (!(itemStack.getItem() instanceof SwordItem) || block instanceof WebBlock)) {
                 float strVsBlock = itemStack.getItem().getDestroySpeed(itemStack, blockState);
                 if (strVsBlock > 1.0F && !(block instanceof DropExperienceBlock) && !(block instanceof RedStoneOreBlock)) {
-                    int i = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, itemStack);
+                    int i = InventoryUtils.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, itemStack);
                     if (i > 0) {
                         strVsBlock += (float) (i * i + 1);
                     }

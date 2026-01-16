@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,19 +36,8 @@ public class NetworkUtils {
     public static void sendPacketNoEvent(Packet<?> packet) {
         LOGGER.info("Sending: " + packet.getClass().getName());
         if (packet instanceof ServerboundCustomPayloadPacket sb) {
-            LOGGER.info("RE custompayload, {}", sb.getIdentifier().toString());
-            if (sb.getIdentifier().toString().equals("heypixelmod:s2cevent")) {
-                FriendlyByteBuf data = sb.getData();
-                data.markReaderIndex();
-                int id = data.readVarInt();
-                LOGGER.info("after packet ({}", id);
-                if (id == 2) {
-                    LOGGER.info("after packet");
-                    LOGGER.info(Arrays.toString(MixinProtectionUtils.readByteArray(data, data.readableBytes())));
-                }
-
-                data.resetReaderIndex();
-            }
+            LOGGER.info("RE custompayload, {}", sb.payload().id().id().toString());
+            // In 1.20.6, we should ideally handle specific payload types
         }
 
         passthroughsPackets.add(packet);

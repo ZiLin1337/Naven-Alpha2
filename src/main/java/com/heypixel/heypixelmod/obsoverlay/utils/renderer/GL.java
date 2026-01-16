@@ -7,6 +7,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
@@ -17,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 public class GL {
+    private static final Logger log = LogManager.getLogger(GL.class);
     private static final FloatBuffer MAT = BufferUtils.createFloatBuffer(16);
     private static final ICapabilityTracker DEPTH = getTracker("DEPTH");
     private static final ICapabilityTracker BLEND = getTracker("BLEND");
@@ -93,10 +96,10 @@ public class GL {
                     BufferUploaderAccessor.setCurrentVertexBuffer(null);
                 }
             } catch (Exception var2) {
-                System.err.println("Error binding VAO " + vao + ": " + var2.getMessage());
+                log.error("Error binding VAO {}: {}", vao, var2.getMessage());
             }
         } else {
-            System.err.println("WARNING: Attempted to bind invalid VAO: " + vao);
+            log.warn("WARNING: Attempted to bind invalid VAO: {}", vao);
         }
     }
 
@@ -113,7 +116,7 @@ public class GL {
             int bindTarget = ibo != 0 ? ibo : prevIbo;
             GlStateManager._glBindBuffer(34963, bindTarget);
         } catch (Exception var2) {
-            System.err.println("Error binding IBO: " + var2.getMessage());
+            log.error("Error binding IBO: {}", var2.getMessage());
         }
     }
 
@@ -318,7 +321,7 @@ public class GL {
             capStateField.setAccessible(true);
             return (ICapabilityTracker) capStateField.get(state);
         } catch (IllegalAccessException | NoSuchFieldException var10) {
-            var10.printStackTrace();
+            log.error("Failed to get capability tracker for field: {}", fieldName, var10);
             return null;
         }
     }

@@ -22,7 +22,6 @@ public class SkiaContext {
     }
 
     public static void createSurface(int width, int height) {
-        System.out.println("createSurface");
         if (context == null) {
             context = DirectContext.makeGL();
         }

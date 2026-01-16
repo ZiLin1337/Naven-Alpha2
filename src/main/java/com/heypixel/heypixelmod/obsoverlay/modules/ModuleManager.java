@@ -61,7 +61,6 @@ public class ModuleManager {
                 new Teams(),
                 new Glow(),
                 new ItemTracker(),
-//                new AutoMLG(),
                 new ClientFriend(),
                 new NoJumpDelay(),
                 new FastPlace(),
@@ -81,8 +80,6 @@ public class ModuleManager {
                 new AntiNausea(),
                 new Scoreboard(),
                 new Compass(),
-//                new Spammer(),
-//                new KillSay(),
                 new Blink(),
                 new FastWeb(),
                 new PostProcess(),
@@ -91,7 +88,6 @@ public class ModuleManager {
                 new NoRender(),
                 new ItemTags(),
                 new SafeWalk(),
-//                new MotionBlur(),
                 new Helper(),
                 new NoSlow(),
                 new LongJump(),
@@ -107,7 +103,6 @@ public class ModuleManager {
                 new Notification(),
                 new AutoHeypixel(),
                 new ArrayListModule(),
-//                new Speed(),
                 new GrimLowHop()
         );
     }

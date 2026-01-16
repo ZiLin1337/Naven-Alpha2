@@ -1,6 +1,6 @@
-# Naven-Alpha2
+# Naven-Alpha (Fabric 1.20.6)
 
-一个基于Naven-Alpha开源的修改客户端，没有验证，如果你想使用，请自己构建
+一个基于Naven-Alpha开源的修改客户端，已从Forge 1.20.1迁移到Fabric 1.20.6。
 
 原项目开源地址： https://github.com/jiuxianqwq/NavenAlpha
 
@@ -8,20 +8,21 @@
 
 ### 核心功能
 
-- **模块化架构**: 可扩展的模块系统，支持动态加载和管理
-- **事件驱动系统**: 高效的事件管理机制
+- **Fabric 1.20.6 支持**: 完全适配最新的 Fabric 环境
+- **模块化架构**: 70+个功能模块，支持动态加载和管理
+- **事件驱动系统**: 高效的自定义事件管理机制
+- **GPU加速UI**: 使用 Skija 进行高性能 UI 渲染
 - **命令系统**: 完整的命令行界面支持
 - **配置管理**: 灵活的配置文件系统，支持热重载
 - **通知系统**: 实时消息通知
-- **精美UI**：打滑了100个客户端的美丽视觉，给您带来最好的体验
-
 
 ## 🛠️ 安装指南
 
 ### 前置要求
 
 1. 安装 Java 17 或更高版本
-2. 安装 Minecraft Forge 1.20.1 (版本 47.3.0 或更高)
+2. 安装 Fabric Loader 0.15.11 或更高版本
+3. 安装 Fabric API 0.98.0+
 
 ### 构建步骤
 
@@ -38,14 +39,15 @@ cd Naven-Alpha2
 
 ### 安装模组
 
-1. 将生成的 `.jar` 文件复制到 Minecraft 的 `mods` 文件夹
-2. 启动游戏即可使用
+1. 将生成的 `naven-alpha-1337.jar` 文件复制到 Minecraft 的 `mods` 文件夹
+2. 确保已放入 Fabric API
+3. 启动游戏即可使用
 
 ## ⚙️ 配置
 
 ### 基本设置
 
-模组支持以下配置文件：
+模组支持以下配置文件 (位于 `.minecraft/naven/`):
 
 - `settings.json` - 主要配置文件
 - `binds.json` - 按键绑定配置
@@ -83,45 +85,24 @@ src/main/java/com/heypixel/heypixelmod/obsoverlay/
 ├── events/           # 事件系统
 ├── files/            # 文件管理
 ├── modules/          # 功能模块
-│   ├── impl/
-│   │   ├── combat/   # 战斗模块
-│   │   ├── misc/     # 杂项模块
-│   │   ├── move/     # 移动模块
-│   │   └── render/   # 渲染模块
 ├── ui/               # 用户界面
 ├── utils/            # 工具类
 └── values/           # 配置值系统
 ```
 
-### 添加新模块
+### 迁移说明 (Forge -> Fabric)
 
-1. 在对应分类目录下创建新的模块类
-2. 继承 `Module` 类并添加 `@ModuleInfo` 注解
-3. 实现所需的事件处理方法
-4. 在 `ModuleManager` 中注册新模块
-
-### API 使用
-
-```java
-// 创建新模块示例
-@ModuleInfo(
-    name = "MyModule",
-    description = "模块描述",
-    category = Category.MISC
-)
-public class MyModule extends Module {
-    @EventTarget
-    public void onUpdate(EventUpdate event) {
-        // 实现功能逻辑
-    }
-}
-```
+- 构建系统已迁移至 Fabric Loom
+- 事件系统已适配 Fabric
+- Mixins 已更新至 1.20.6 Yarn 映射
+- 核心库 (SmartBoot AIO, Skija) 已完成适配
 
 ## 📝 版本信息
 
-- **当前版本**: Naven-Alpha2
-- **Minecraft 版本**: 1.20.1
-- **Forge 版本**: 47.4.6
+- **当前版本**: 1337
+- **Minecraft 版本**: 1.20.6
+- **Loader 版本**: Fabric Loader 0.15.11+
+- **Fabric API**: 0.98.0+
 
 ## ⚖️ 许可证
 
@@ -134,4 +115,3 @@ public class MyModule extends Module {
 ## ⚠️ 免责声明
 
 本模组仅供学习和研究目的使用。使用者需自行承担使用风险，开发者不对任何因使用本模组导致的问题负责。请遵守游戏服务器的规则和条款。
-

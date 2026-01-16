@@ -20,6 +20,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +36,7 @@ import javax.annotation.Nullable;
         priority = 100
 )
 public class MixinGui {
+    private static final Logger log = LogManager.getLogger(MixinGui.class);
     @Shadow
     @Nullable
     protected Component title;
@@ -161,7 +164,7 @@ public class MixinGui {
                 Skia.restore();
             });
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.error("Error in renderCrosshair", e);
         }
     }
 }

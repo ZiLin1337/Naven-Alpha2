@@ -2,9 +2,11 @@ package com.heypixel.heypixelmod.obsoverlay.utils;
 
 import com.heypixel.heypixelmod.obsoverlay.modules.impl.move.Scaffold;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
@@ -16,6 +18,11 @@ import java.util.List;
 
 public class InventoryUtils {
     private static final Minecraft mc = Minecraft.getInstance();
+
+    public static int getEnchantmentLevel(ResourceKey<Enchantment> enchantment, ItemStack stack) {
+        if (mc.level == null || stack.isEmpty()) return 0;
+        return getEnchantmentLevel(mc.level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(enchantment), stack);
+    }
 
     public static boolean shouldDisableFeatures() {
         return getAllItems().stream().anyMatch(item -> {
@@ -46,7 +53,7 @@ public class InventoryUtils {
         } else if (!(stack.getItem() instanceof AxeItem)) {
             return false;
         } else {
-            int itemEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack);
+            int itemEnchantmentLevel = getEnchantmentLevel(Enchantments.SHARPNESS, stack);
             return itemEnchantmentLevel >= 8 && itemEnchantmentLevel < 50;
         }
     }
@@ -55,7 +62,7 @@ public class InventoryUtils {
         if (stack.isEmpty()) {
             return false;
         } else {
-            return stack.getItem() == Items.GOLDEN_AXE && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack) > 100;
+            return stack.getItem() == Items.GOLDEN_AXE && getEnchantmentLevel(Enchantments.SHARPNESS, stack) > 100;
         }
     }
 
@@ -71,7 +78,7 @@ public class InventoryUtils {
         if (stack.isEmpty()) {
             return false;
         } else {
-            return stack.getItem() == Items.SLIME_BALL && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1;
+            return stack.getItem() == Items.SLIME_BALL && getEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1;
         }
     }
 
@@ -79,7 +86,7 @@ public class InventoryUtils {
         if (stack.isEmpty()) {
             return false;
         } else {
-            return stack.getItem() == Items.STICK && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1;
+            return stack.getItem() == Items.STICK && getEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1;
         }
     }
 
@@ -104,11 +111,11 @@ public class InventoryUtils {
     }
 
     public static int getPunchLevel(ItemStack stack) {
-        return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+        return getEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
     }
 
     public static int getPowerLevel(ItemStack stack) {
-        return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+        return getEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
     }
 
     public static List<ItemStack> getAllItems() {
@@ -403,10 +410,10 @@ public class InventoryUtils {
             return 0.0F;
         } else if (stack.getItem() instanceof BowItem) {
             float valence = 10.0F;
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack);
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack);
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack) / 10.0F;
+            valence += (float) getEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.POWER_ARROWS, stack) / 10.0F;
             return valence + (float) stack.getDamageValue() / (float) stack.getMaxDamage();
         } else {
             return 0.0F;
@@ -420,10 +427,10 @@ public class InventoryUtils {
             return 0.0F;
         } else if (stack.getItem() instanceof BowItem) {
             float valence = 10.0F;
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack) / 10.0F;
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack);
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack);
-            valence += (float) EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack) / 10.0F;
+            valence += (float) getEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack);
+            valence += (float) getEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             return valence + (float) stack.getDamageValue() / (float) stack.getMaxDamage();
         } else {
             return 0.0F;
@@ -453,7 +460,7 @@ public class InventoryUtils {
                 valence += stack.getDestroySpeed(Blocks.DIRT.defaultBlockState());
             }
 
-            int efficiency = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, stack);
+            int efficiency = getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, stack);
             if (efficiency > 0) {
                 valence += (float) efficiency * 0.0075F;
             }
@@ -483,9 +490,9 @@ public class InventoryUtils {
                 }
             }
 
-            int itemEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack);
+            int itemEnchantmentLevel = getEnchantmentLevel(Enchantments.SHARPNESS, stack);
             if (itemEnchantmentLevel > 0) {
-                float damageBonus = Enchantments.SHARPNESS.getDamageBonus(itemEnchantmentLevel, MobType.UNDEFINED);
+                float damageBonus = 0.5F * itemEnchantmentLevel + 0.5F;
                 valence += damageBonus;
             }
 
@@ -504,9 +511,9 @@ public class InventoryUtils {
                 valence += sword.getDamage() + 1.0F;
             }
 
-            int itemEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack);
+            int itemEnchantmentLevel = getEnchantmentLevel(Enchantments.SHARPNESS, stack);
             if (itemEnchantmentLevel > 0) {
-                float damageBonus = Enchantments.SHARPNESS.getDamageBonus(itemEnchantmentLevel, MobType.UNDEFINED);
+                float damageBonus = 0.5F * itemEnchantmentLevel + 0.5F;
                 valence += damageBonus;
             }
 
@@ -538,7 +545,7 @@ public class InventoryUtils {
                 }
             }
 
-            valence += EnchantmentHelper.getItemEnchantmentLevel(Enchantments.ALL_DAMAGE_PROTECTION, itemStack);
+            valence += getEnchantmentLevel(Enchantments.ALL_DAMAGE_PROTECTION, itemStack);
             return (float) valence;
         }
     }
@@ -551,9 +558,9 @@ public class InventoryUtils {
             return 0.0F;
         } else {
             if (stack.getItem() instanceof CrossbowItem) {
-                valence += EnchantmentHelper.getItemEnchantmentLevel(Enchantments.QUICK_CHARGE, stack);
-                valence += EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MULTISHOT, stack);
-                valence += EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PIERCING, stack);
+                valence += getEnchantmentLevel(Enchantments.QUICK_CHARGE, stack);
+                valence += getEnchantmentLevel(Enchantments.MULTISHOT, stack);
+                valence += getEnchantmentLevel(Enchantments.PIERCING, stack);
             }
 
             return (float) valence;
@@ -565,9 +572,9 @@ public class InventoryUtils {
             return false;
         } else if (stack.getItem() instanceof AxeItem
                 && stack.getItem() == Items.GOLDEN_AXE
-                && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack) > 100) {
+                && getEnchantmentLevel(Enchantments.SHARPNESS, stack) > 100) {
             return true;
-        } else if (stack.getItem() == Items.SLIME_BALL && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1) {
+        } else if (stack.getItem() == Items.SLIME_BALL && getEnchantmentLevel(Enchantments.KNOCKBACK, stack) > 1) {
             return true;
         } else {
             return stack.getItem() == Items.TOTEM_OF_UNDYING || stack.getItem() == Items.END_CRYSTAL;
