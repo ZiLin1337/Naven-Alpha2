@@ -1,11 +1,11 @@
 package com.heypixel.heypixelmod.obsoverlay.events.impl;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.Input;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class CustomKeyboardInput extends Input {
     private final Options options;
     private boolean cancel;

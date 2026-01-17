@@ -2,19 +2,9 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
+            name = 'MinecraftForge'
+            url = 'https://maven.minecraftforge.net/'
         }
-        maven {
-            name = 'Sponge'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-        // 补充：Mojang仓库（插件解析阶段可选，提升Loom插件兼容性）
-        maven {
-            name = 'Mojang'
-            url = 'https://libraries.minecraft.net/'
-        }
-        mavenCentral()
     }
 }
 
@@ -23,25 +13,3 @@ plugins {
 }
 
 rootProject.name = 'Naven-Alpha'
-
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-    repositories {
-        gradlePluginPortal()
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
-        maven {
-            name = 'Sponge'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-        // 核心补充：Mojang官方仓库（Fabric Loom必需，用于下载Minecraft核心依赖）
-        // 解决「Cannot get MinecraftProvider before it has been setup」的潜在依赖缺失问题
-        maven {
-            name = 'Mojang'
-            url = 'https://libraries.minecraft.net/'
-        }
-        mavenCentral()
-    }
-}

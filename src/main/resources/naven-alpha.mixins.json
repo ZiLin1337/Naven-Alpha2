@@ -1,9 +1,9 @@
 {
   "required": true,
-  "minVersion": "0.8.5",
+  "minVersion": "0.8",
   "package": "com.heypixel.heypixelmod.mixin.O",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "naven-alpha.refmap.json",
+  "refmap": "Naven-Alpha.refmap.json",
   "mixins": [],
   "client": [
     "CapabilityTrackerMixin",
@@ -20,7 +20,6 @@
     "MixinFriendlyByteBuf",
     "MixinGameRenderer",
     "MixinGui",
-    "MixinInventory",
     "MixinItem",
     "MixinItemInHandLayer",
     "MixinItemInHandRenderer",

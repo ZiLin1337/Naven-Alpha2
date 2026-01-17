@@ -26,6 +26,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
  * @Author：jiuxian_baka
@@ -78,11 +82,62 @@ public class Animations extends Module {
     @Override
     public void onEnable() {
         super.onEnable();
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+        MinecraftForge.EVENT_BUS.unregister(this);
+    }
+
+    @SubscribeEvent
+    public void onRenderHand(RenderHandEvent event) {
+        if (!this.isEnabled() || BlockMods.getCurrentMode().equals("None"))
+            return;
+
+        if (event.getHand() != InteractionHand.MAIN_HAND || !(event.getItemStack().getItem() instanceof SwordItem))
+            return;
+
+        ItemStack serverMainHandItem = mc.player.getMainHandItem();
+        if (!(serverMainHandItem.getItem() instanceof SwordItem)) {
+            return;
+        }
+
+        boolean isOffhandUsing = false;
+        if (mc.player.isUsingItem() && mc.player.getUsedItemHand() == InteractionHand.OFF_HAND) {
+            ItemStack offhandItem = mc.player.getOffhandItem();
+            UseAnim useAnim = offhandItem.getUseAnimation();
+            if (useAnim != UseAnim.BLOCK) {
+                isOffhandUsing = true;
+            }
+        }
+
+        boolean isKillauraBlocking = auraAutoBlock.getCurrentValue() && getAuraTarget() != null;
+
+        if (onlyAura.getCurrentValue() && !isKillauraBlocking) {
+            return;
+        }
+
+        if (isOffhandUsing && !isKillauraBlocking)
+            return;
+
+        if (!mc.options.keyUse.isDown() && !isKillauraBlocking)
+            return;
+
+        event.setCanceled(true);
+
+        renderArmWithItem(
+                mc.player,
+                event.getPartialTick(),
+                event.getEquipProgress(),
+                event.getHand(),
+                event.getSwingProgress(),
+                event.getItemStack(),
+                event.getEquipProgress(),
+                event.getPoseStack(),
+                event.getMultiBufferSource(),
+                event.getPackedLight());
     }
 
     @EventTarget
@@ -125,8 +180,9 @@ public class Animations extends Module {
             offHandHeight = Mth.clamp(offHandHeight - 0.4F, 0.0F, 1.0F);
         } else {
             float f = localplayer.getAttackStrengthScale(1.0F);
-            boolean flag = shouldCauseReequipAnimation(mainHandItem, itemstack, localplayer.getInventory().selected);
-            boolean flag1 = shouldCauseReequipAnimation(offHandItem, itemstack1, -1);
+            boolean flag = ForgeHooksClient.shouldCauseReequipAnimation(mainHandItem, itemstack,
+                    localplayer.getInventory().selected);
+            boolean flag1 = ForgeHooksClient.shouldCauseReequipAnimation(offHandItem, itemstack1, -1);
 
             if (!flag && mainHandItem != itemstack) {
                 mainHandItem = itemstack;
@@ -149,10 +205,6 @@ public class Animations extends Module {
         if (offHandHeight < 0.1F) {
             offHandItem = itemstack1;
         }
-    }
-
-    private static boolean shouldCauseReequipAnimation(ItemStack from, ItemStack to, int slot) {
-        return !ItemStack.matches(from, to);
     }
 
     private boolean isBlocking() {

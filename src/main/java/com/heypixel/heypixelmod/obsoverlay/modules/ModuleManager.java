@@ -56,7 +56,6 @@ public class ModuleManager {
                 new AntiBots(),
                 new Sprint(),
                 new ChestESP(),
-                new InventoryHUD(),
                 new ClickGUIModule(),
                 new Teams(),
                 new Glow(),

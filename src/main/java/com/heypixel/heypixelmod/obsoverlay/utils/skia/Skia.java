@@ -17,9 +17,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.awt.Color;
 import java.io.File;
@@ -646,7 +646,7 @@ public class Skia {
     }
 
     public static void drawEffectIcon(MobEffect effect, float x, float y, float width, float height) {// 1. 获取效果的注册名 (例如 "minecraft:speed")
-        ResourceLocation registryName = BuiltInRegistries.MOB_EFFECT.getKey(effect);
+        ResourceLocation registryName = ForgeRegistries.MOB_EFFECTS.getKey(effect);
 
         if (registryName == null) {
             return;

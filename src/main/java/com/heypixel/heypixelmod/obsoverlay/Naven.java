@@ -4,8 +4,6 @@ import com.heypixel.heypixelmod.obsoverlay.commands.CommandManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventManager;
 import com.heypixel.heypixelmod.obsoverlay.events.api.EventTarget;
 import com.heypixel.heypixelmod.obsoverlay.events.api.types.EventType;
-import com.heypixel.heypixelmod.obsoverlay.events.impl.EventMotion;
-import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRespawn;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventRunTicks;
 import com.heypixel.heypixelmod.obsoverlay.events.impl.EventShutdown;
 import com.heypixel.heypixelmod.obsoverlay.files.FileManager;
@@ -21,7 +19,12 @@ import com.heypixel.heypixelmod.obsoverlay.utils.skia.context.SkiaContext;
 import com.heypixel.heypixelmod.obsoverlay.values.HasValueManager;
 import com.heypixel.heypixelmod.obsoverlay.values.ValueManager;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.awt.*;
 import java.io.IOException;
@@ -34,11 +37,10 @@ public class Naven {
 
     private static Naven instance;
 
-    private boolean initialized;
-
     public boolean canPlaySound = false;
 
     private EventManager eventManager;
+    private EventWrapper eventWrapper;
     private ValueManager valueManager;
     private HasValueManager hasValueManager;
     private RotationManager rotationManager;
@@ -48,24 +50,40 @@ public class Naven {
     private NotificationManager notificationManager;
 
     private Naven() {
+        b(null, null);
     }
 
     public static void init() {
-        getInstance().initialize();
+        if (instance != null) {
+            return;
+        }
+
+        RenderSystem.recordRenderCall(() -> {
+            try {
+                if (instance == null) {
+                    new Naven();
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load client");
+                e.printStackTrace(System.err);
+            }
+        });
+    }
+
+    public static EntityHitResult b(Entity entity) {
+        init();
+        return null;
     }
 
     public static Naven getInstance() {
         if (instance == null) {
-            instance = new Naven();
+            init();
         }
         return instance;
     }
 
-    public synchronized void initialize() {
-        if (initialized) {
-            return;
-        }
-        initialized = true;
+    public EntityHitResult b(Player player, Exception e) {
+        instance = this;
 
         this.eventManager = new EventManager();
 
@@ -80,6 +98,7 @@ public class Naven {
             throw new RuntimeException(ex);
         }
 
+        this.eventWrapper = new EventWrapper();
         this.valueManager = new ValueManager();
         this.hasValueManager = new HasValueManager();
         this.moduleManager = ModuleManager.b("8964破解全家死光亲妈猪逼被操烂亲爹没鸡巴生小孩没屁眼操你血妈");
@@ -91,16 +110,18 @@ public class Naven {
         this.fileManager.load();
         this.moduleManager.getModule(ClickGUIModule.class).setEnabled(false);
 
-        this.eventManager.register(this);
-        this.eventManager.register(this.rotationManager);
+        this.eventManager.register(getInstance());
+        this.eventManager.register(this.eventWrapper);
+        this.eventManager.register(new RotationManager());
         this.eventManager.register(new NetworkUtils());
         this.eventManager.register(new ServerUtils());
         this.eventManager.register(new EntityWatcher());
+        MinecraftForge.EVENT_BUS.register(this.eventWrapper);
 
         canPlaySound = true;
         SoundUtils.playSound("opening.wav", 1f);
+        return null;
     }
-
 
     @EventTarget
     public void onShutdown(EventShutdown e) {
@@ -115,17 +136,13 @@ public class Naven {
         }
     }
 
-    @EventTarget
-    public void onMotion(EventMotion e) {
-        if (e.getType() == EventType.PRE && Minecraft.getInstance().player != null && Minecraft.getInstance().player.tickCount <= 1) {
-            this.eventManager.call(new EventRespawn());
-        }
-    }
-
     public EventManager getEventManager() {
         return this.eventManager;
     }
 
+    public EventWrapper getEventWrapper() {
+        return this.eventWrapper;
+    }
 
     public ValueManager getValueManager() {
         return this.valueManager;
